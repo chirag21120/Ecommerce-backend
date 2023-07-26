@@ -5,12 +5,13 @@ exports.fetchUserById = async (req, res) => {
   const { id } = req.params;
   console.log(id)
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id,"username email id addresses role");
     res.status(200).json(user);
   } catch (err) {
     res.status(400).json(err);
   }
 };
+
 
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
