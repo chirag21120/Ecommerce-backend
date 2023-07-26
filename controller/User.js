@@ -2,8 +2,7 @@ const { Category } = require('../model/Category');
 const { User } = require('../model/User');
 
 exports.fetchUserById = async (req, res) => {
-  const { id } = req.params;
-  console.log(id)
+  const { id } = req.user;
   try {
     const user = await User.findById(id,"username email id addresses role");
     res.status(200).json(user);
