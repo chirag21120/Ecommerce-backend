@@ -8,8 +8,9 @@ const userSchema = new Schema({
   role: { type: String, required: true, default:'user' },
   addresses: { type: [Schema.Types.Mixed] }, 
   // TODO:  We can make a separate Schema for this
-  salt: Buffer
-});
+  salt: Buffer,
+  resetPasswordToken: {type:String,default:''},
+},{timestamps:true});
 
 const virtual = userSchema.virtual('id');
 virtual.get(function () {
