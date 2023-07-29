@@ -6,7 +6,6 @@ const {
   updateProduct,
   fetchAdminProducts,
 } = require("../controller/Product");
-const { Product } = require("../model/Product");
 
 const router = express.Router();
 
