@@ -3,7 +3,6 @@ const server = express();
 const crypto = require("crypto");
 const session = require("express-session");
 const passport = require("passport");
-// const SQLiteStore = require('connect-sqlite3')(session);
 const LocalStrategy = require("passport-local").Strategy;
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
@@ -29,10 +28,6 @@ connectToMongo();
 
 const port = process.env.PORT;
 const secret_key = process.env.JWT_SECRET;
-
-//emails 
-
-  
 
 
 //webhook
@@ -72,7 +67,7 @@ opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = secret_key;
 
 //Middlewares
-server.use(express.static(path.resolve(__dirname,'build')))
+// server.use(express.static(path.resolve(__dirname,'build')))
 server.use(cookieParser())
 server.use(
   session({
