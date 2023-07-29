@@ -21,6 +21,8 @@ const cors = require("cors");
 const { User } = require("./model/User");
 const { isAuth, sanitizeUser, cookieExtractor } = require("./services/common");
 const dotenv = require("dotenv");
+const path = require('path');
+const { Order } = require("./model/Order");
 
 dotenv.config();
 connectToMongo();
@@ -35,7 +37,7 @@ const secret_key = process.env.JWT_SECRET;
 
 //webhook
 const endpointSecret = process.env.ENDPOINT_SECRET
-server.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
+server.post('/webhook', express.raw({type: 'application/json'}),async (request, response) => {
     const sig = request.headers['stripe-signature'];
   
     let event;
@@ -51,7 +53,9 @@ server.post('/webhook', express.raw({type: 'application/json'}), (request, respo
     switch (event.type) {
       case 'payment_intent.succeeded':
         const paymentIntentSucceeded = event.data.object;
-        // Then define and call a function to handle the event payment_intent.succeeded
+        const order = await Order.findById(paymentIntentSucceeded.metadata.orderId);
+        order.paymentStatus = 'recieved';
+        await order.save();
         break;
       // ... handle other event types
       default:
@@ -68,7 +72,7 @@ opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = secret_key;
 
 //Middlewares
-server.use(express.static('build'))
+server.use(express.static(path.resolve(__dirname,'build')))
 server.use(cookieParser())
 server.use(
   session({
@@ -92,6 +96,11 @@ server.use("/users",isAuth(), userRouter.router);
 server.use("/auth", authRouter.router);
 server.use("/cart", isAuth(), cartRouter.router);
 server.use("/orders", isAuth(), orderReducer.router);
+
+//if no path is matched
+server.get('*',(req,res)=>
+res.sendFile(path.resolve('build','index.html'))
+);
 
 //Passport Strategies
 passport.use(
@@ -163,22 +172,17 @@ const stripe_key = process.env.STRIPE_KEY
 const stripe = require("stripe")(stripe_key);
 
 
-const calculateOrderAmount = (items) => {
-  // Replace this constant with a calculation of the order's amount
-  // Calculate the order total on the server to prevent
-  // people from directly manipulating the amount on the client
-  return 1400;
-};
-
 server.post("/create-payment-intent", async (req, res) => {
-  const { toalAmount } = req.body;
-
+  const { totalAmount,orderId } = req.body;
   // Create a PaymentIntent with the order amount and currency
   const paymentIntent = await stripe.paymentIntents.create({
     amount: totalAmount*100,
     currency: "inr",
     automatic_payment_methods: {
       enabled: true,
+    },
+    metadata:{
+        orderId,
     },
   });
 
