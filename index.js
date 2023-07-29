@@ -28,7 +28,9 @@ connectToMongo();
 
 const port = process.env.PORT;
 const secret_key = process.env.JWT_SECRET;
+const stripe_key = process.env.STRIPE_KEY
 
+const stripe = require("stripe")(stripe_key);
 
 //webhook
 const endpointSecret = process.env.ENDPOINT_SECRET
@@ -163,8 +165,6 @@ passport.deserializeUser(function (user, cb) {
 //payment intent
 
 // This is your test secret API key.
-const stripe_key = process.env.STRIPE_KEY
-const stripe = require("stripe")(stripe_key);
 
 
 server.post("/create-payment-intent", async (req, res) => {
