@@ -139,8 +139,8 @@ passport.use(
         return done(null, false);
       }
     } catch (error) {
-      if (err) {
-        return done(err, false);
+      if (error) {
+        return done(error, false);
       }
     }
   })
