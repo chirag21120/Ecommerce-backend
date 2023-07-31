@@ -75,7 +75,7 @@ exports.resetPasswordRequest = async (req, res) => {
     const token = crypto.randomBytes(48).toString('hex');
     user.resetPasswordToken = token;
     await user.save();
-    const link = "http://localhost:3000/reset-password?token="+token+'&email='+email;
+    const link = "https://ecommerce-backend-lyart.vercel.app/reset-password?token="+token+'&email='+email;
   const subject = "Reset Password for e-commerce";
   const html = `<p> <a href='${link}'>Click here</a> to reset your Password</p>`
   if(email){
