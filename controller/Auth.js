@@ -10,6 +10,10 @@ const secret_key = process.env.JWT_SECRET;
 
 exports.createUser = async (req, res) => {
   try {
+    const already = await User.findOne({email:req.body.email})
+    if(already){
+     return res.sendStatus(400);
+    }
     const salt = crypto.randomBytes(16);
     crypto.pbkdf2(
       req.body.password,
@@ -25,6 +29,7 @@ exports.createUser = async (req, res) => {
             res.status(400).json(err);
           } else {
             const token = jwt.sign(sanitizeUser(user), secret_key);
+  const expirationTime = Date.now() +3600000;
             res
               .cookie("jwt", token, {
                 expires: new Date(expirationTime),
@@ -40,6 +45,9 @@ exports.createUser = async (req, res) => {
     res.status(400).json(err);
   }
 };
+
+
+
 
 exports.loginUser = async (req, res) => {
   const user = req.user
